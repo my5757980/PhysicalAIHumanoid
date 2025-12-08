@@ -9,27 +9,34 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      # Checkout repository without submodules
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           persist-credentials: false
+          submodules: false   # ✅ Prevent submodule errors
+          fetch-depth: 0      # ✅ Full history needed for gh-pages deploy
 
+      # Setup Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 24
           cache: 'npm'
 
+      # Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # Build the Docusaurus site
       - name: Build Docusaurus
         run: npm run build
 
+      # Deploy to GitHub Pages using PAT
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}  # ✅ Use your PAT here
           publish_dir: ./build
           user_name: "GitHub Actions"
           user_email: "actions@github.com"
