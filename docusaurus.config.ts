@@ -2,8 +2,6 @@ import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
-
 const config: Config = {
   title: 'Physical AI & Humanoid Robotics — AI-Native Textbook',
   tagline: 'Comprehensive textbook on embodied intelligence and humanoid robotics',
@@ -13,11 +11,12 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://your-docusaurus-site.example.com',
-  baseUrl: '/',
+  // ✅ GitHub Pages URL
+  url: 'https://my5757980.github.io',
+  baseUrl: '/PhysicalAIHumanoid/',
 
-  organizationName: 'facebook',
-  projectName: 'docusaurus',
+  organizationName: 'my5757980',
+  projectName: 'PhysicalAIHumanoid',
 
   onBrokenLinks: 'throw',
 
@@ -33,7 +32,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/my5757980/PhysicalAIHumanoid/tree/main/',
         },
         blog: {
           showReadingTime: true,
@@ -42,10 +41,7 @@ const config: Config = {
             xslt: true,
           },
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
+            'https://github.com/my5757980/PhysicalAIHumanoid/tree/main/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -74,7 +70,7 @@ const config: Config = {
         },
         { to: '/blog', label: 'Blog', position: 'left' },
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/my5757980/PhysicalAIHumanoid',
           label: 'GitHub',
           position: 'right',
         },
@@ -86,39 +82,18 @@ const config: Config = {
         {
           title: 'Textbook',
           items: [
-            {
-              label: 'Introduction',
-              to: '/docs/intro',
-            },
-            {
-              label: 'Chapter 1',
-              to: '/docs/chapter-1', // ✅ fixed
-            },
-            {
-              label: 'Chapter 2',
-              to: '/docs/chapter-2', // ✅ fixed
-            },
-            {
-              label: 'Chapter 3',
-              to: '/docs/chapter-3', // ✅ fixed
-            },
-            {
-              label: 'Chapter 4',
-              to: '/docs/chapter-4', // ✅ fixed
-            },
+            { label: 'Introduction', to: '/docs/intro' },
+            { label: 'Chapter 1', to: '/docs/chapter-1' },
+            { label: 'Chapter 2', to: '/docs/chapter-2' },
+            { label: 'Chapter 3', to: '/docs/chapter-3' },
+            { label: 'Chapter 4', to: '/docs/chapter-4' },
           ],
         },
         {
           title: 'Resources',
           items: [
-            {
-              label: 'Docusaurus',
-              href: 'https://docusaurus.io',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
-            },
+            { label: 'Docusaurus', href: 'https://docusaurus.io' },
+            { label: 'GitHub', href: 'https://github.com/facebook/docusaurus' },
           ],
         },
       ],
