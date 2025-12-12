@@ -16,8 +16,7 @@ const ChatWidget = () => {
   // ------------------------------------------------------------
   // ✅ Fix: Removed import.meta — use process.env instead
   // ------------------------------------------------------------
-  const API_BASE_URL =
-    process.env.BACKEND_URL || 'http://localhost:8000';
+  const API_BASE_URL = 'https://your-vercel-project.vercel.app/api/ask_stream';
 
   // --------------------------------------------
   // Function to get selected text from the page
