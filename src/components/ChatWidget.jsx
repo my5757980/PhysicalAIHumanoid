@@ -13,14 +13,9 @@ const ChatWidget = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // ------------------------------------------------------------
-  // ✅ Fix: Removed import.meta — use process.env instead
-  // ------------------------------------------------------------
-  const API_BASE_URL = 'https://your-vercel-project.vercel.app/api/ask_stream';
+  // ✅ Use environment variable for backend
+  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
-  // --------------------------------------------
-  // Function to get selected text from the page
-  // --------------------------------------------
   const getSelectedText = () => {
     const text = window.getSelection().toString().trim();
     return text || null;
@@ -38,14 +33,12 @@ const ChatWidget = () => {
     };
 
     document.addEventListener('mouseup', handleSelection);
-
     const escHandler = (e) => {
       if (e.key === 'Escape') {
         setSelectedText(null);
         setIsUserSelectedMode(false);
       }
     };
-
     document.addEventListener('keyup', escHandler);
 
     return () => {
@@ -68,24 +61,15 @@ const ChatWidget = () => {
     const userMessage = { type: 'user', content: inputValue };
     const currentSelectedText = isUserSelectedMode ? selectedText : null;
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
 
-    // Create an initial bot message for streaming
-    const initialBotMessage = {
-      type: 'bot',
-      content: '',
-      sources: [],
-      isStreaming: true
-    };
-
-    // Add the initial bot message to the messages array
+    const initialBotMessage = { type: 'bot', content: '', sources: [], isStreaming: true };
     setMessages(prev => [...prev, initialBotMessage]);
-    const botMessageIndex = messages.length; // Index of the bot message we just added
+    const botMessageIndex = messages.length;
 
     try {
-      // Use fetch with streaming
       const response = await fetch(`${API_BASE_URL}/ask_stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,7 +82,6 @@ const ChatWidget = () => {
       });
 
       if (!response.ok) throw new Error(`API error ${response.status}`);
-
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -108,53 +91,40 @@ const ChatWidget = () => {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         buffer += decoder.decode(value, { stream: true });
-
-        // Process each complete JSON line
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ''; // Keep incomplete line in buffer
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             try {
-              const data = JSON.parse(line.slice(6)); // Remove 'data: ' prefix
+              const data = JSON.parse(line.slice(6));
 
               if (data.type === 'sources') {
                 sources = data.sources;
               } else if (data.type === 'answer_chunk') {
                 fullAnswer += data.content;
-                // Update the bot message content with the streamed content
                 setMessages(prev => {
                   const newMessages = [...prev];
-                  newMessages[botMessageIndex] = {
-                    ...newMessages[botMessageIndex],
-                    content: fullAnswer,
-                    sources: sources
-                  };
+                  newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: fullAnswer, sources };
                   return newMessages;
                 });
               } else if (data.type === 'completion') {
-                // Finalize the message when completion is received
                 setMessages(prev => {
                   const newMessages = [...prev];
                   newMessages[botMessageIndex] = {
                     ...newMessages[botMessageIndex],
                     content: data.answer,
                     isStreaming: false,
-                    sources: sources,
-                    validation: data.validation  // Add validation information
+                    sources,
+                    validation: data.validation
                   };
                   return newMessages;
                 });
               } else if (data.type === 'error') {
                 setMessages(prev => {
                   const newMessages = [...prev];
-                  newMessages[botMessageIndex] = {
-                    ...newMessages[botMessageIndex],
-                    content: data.message,
-                    isStreaming: false
-                  };
+                  newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: data.message, isStreaming: false };
                   return newMessages;
                 });
               }
@@ -166,14 +136,9 @@ const ChatWidget = () => {
       }
     } catch (error) {
       console.error(error);
-      // Update the bot message with error
       setMessages(prev => {
         const newMessages = [...prev];
-        newMessages[botMessageIndex] = {
-          ...newMessages[botMessageIndex],
-          content: 'Error occurred. Please try again.',
-          isStreaming: false
-        };
+        newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: 'Error occurred. Please try again.', isStreaming: false };
         return newMessages;
       });
     } finally {
@@ -192,9 +157,7 @@ const ChatWidget = () => {
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
-    if (!isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 150);
-    }
+    if (!isOpen) setTimeout(() => inputRef.current?.focus(), 150);
   };
 
   const clearChat = () => setMessages([]);
@@ -203,9 +166,7 @@ const ChatWidget = () => {
     return (
       <div className="chat-widget-fab" onClick={toggleChat}>
         <div className="chat-icon">💬</div>
-        {isUserSelectedMode && (
-          <div className="selection-indicator"><span>!</span></div>
-        )}
+        {isUserSelectedMode && (<div className="selection-indicator"><span>!</span></div>)}
       </div>
     );
   }
@@ -213,7 +174,6 @@ const ChatWidget = () => {
   return createPortal(
     <div className="chat-widget-overlay">
       <div className="chat-widget">
-
         <div className="chat-header">
           <div className="chat-title">Physical AI Chatbot</div>
           <div className="chat-controls">
@@ -243,9 +203,7 @@ const ChatWidget = () => {
                       <summary>Sources ({msg.sources.length})</summary>
                       <ul>
                         {msg.sources.slice(0, 3).map((s, idx) => (
-                          <li key={idx}>
-                            <strong>{s.chapter}</strong>: {s.section}
-                          </li>
+                          <li key={idx}><strong>{s.chapter}</strong>: {s.section}</li>
                         ))}
                       </ul>
                     </details>
@@ -257,9 +215,7 @@ const ChatWidget = () => {
                     </div>
                   )}
                   <div className="message-text">
-                    {msg.content.split('\n').map((line, j) => (
-                      <p key={j}>{line}</p>
-                    ))}
+                    {msg.content.split('\n').map((line, j) => <p key={j}>{line}</p>)}
                   </div>
                 </div>
               </div>
@@ -268,12 +224,9 @@ const ChatWidget = () => {
 
           {isLoading && (
             <div className="chat-message bot">
-              <div className="typing-indicator">
-                <span></span><span></span><span></span>
-              </div>
+              <div className="typing-indicator"><span></span><span></span><span></span></div>
             </div>
           )}
-
           <div ref={messagesEndRef} />
         </div>
 
@@ -283,24 +236,14 @@ const ChatWidget = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={
-              isUserSelectedMode
-                ? "Ask about the selected text…"
-                : "Ask about Physical AI & Humanoid Robotics…"
-            }
+            placeholder={isUserSelectedMode ? "Ask about the selected text…" : "Ask about Physical AI & Humanoid Robotics…"}
             rows={2}
             disabled={isLoading}
           ></textarea>
-
-          <button
-            className="send-button"
-            onClick={sendMessage}
-            disabled={!inputValue.trim() || isLoading}
-          >
+          <button className="send-button" onClick={sendMessage} disabled={!inputValue.trim() || isLoading}>
             {isLoading ? 'Sending…' : 'Send'}
           </button>
         </div>
-
       </div>
     </div>,
     document.body
