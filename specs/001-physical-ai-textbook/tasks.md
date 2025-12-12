@@ -295,3 +295,46 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+
+---
+
+## New Tasks for Chatbot Integration
+
+### Task 1 — Backend Setup
+- [X] T085 Create FastAPI backend directory in PhysicalAIHumanoid/backend/
+- [X] T086 Create main.py with FastAPI server implementation
+- [X] T087 Create ingest_docs.py for document embedding and ingestion
+- [X] T088 Create utils.py for chunking, embeddings, and retrieval functions
+- [X] T089 Configure Qdrant URL and API key in environment variables
+- [X] T090 Configure Cohere embeddings API in environment variables
+- [X] T091 [P] Configure optional Neon Postgres logging in environment variables
+- [X] T092 Implement POST /ask endpoint in main.py
+- [X] T093 Implement POST /embed endpoint in main.py
+- [X] T094 Implement GET /health endpoint in main.py
+
+### Task 2 — Document Ingestion Pipeline
+- [X] T095 Load all markdown files from /docs directory
+- [X] T096 [P] Implement chunking function in utils.py (300–1200 tokens)
+- [X] T097 [P] Implement overlap function in utils.py (80–200 tokens)
+- [X] T098 Generate Cohere embeddings for document chunks
+- [X] T099 Store document embeddings in Qdrant collection
+
+### Task 3 — Frontend Chat Widget
+- [X] T100 Create ChatWidget component in src/components/ChatWidget.jsx
+- [X] T101 Implement floating button UI in bottom-right position
+- [X] T102 Create chat modal and input interface
+- [X] T103 [P] Implement text selection to send selected text to backend
+- [X] T104 Modify src/theme/Root.js to load chat widget globally
+
+### Task 4 — RAG Logic
+- [X] T105 Implement retrieval function to get relevant chunks from Qdrant
+- [X] T106 Prioritize selected text in retrieval logic when provided
+- [X] T107 Generate answers via ChatKit/OpenAI Agents with retrieved context
+- [X] T108 Attach citations to responses linking to source documents
+- [X] T109 Implement streaming response functionality
+
+### Task 5 — QA & Debugging
+- [X] T110 Implement hallucination detection in response validation
+- [X] T111 Validate citation accuracy in responses
+- [X] T112 Test document chunking and retrieval accuracy
+- [X] T113 Test both text-selection mode and normal mode functionality

@@ -1,6 +1,10 @@
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import webpack from 'webpack';
+
+// ✅ Load .env variables
+require('dotenv').config();
 
 const config: Config = {
   title: 'Physical AI & Humanoid Robotics — AI-Native Textbook',
@@ -11,7 +15,7 @@ const config: Config = {
     v4: true,
   },
 
-  // ✅ GitHub Pages URL
+  // Production Website URL
   url: 'https://my5757980.github.io',
   baseUrl: '/PhysicalAIHumanoid/',
 
@@ -48,6 +52,27 @@ const config: Config = {
         },
       } satisfies Preset.Options,
     ],
+  ],
+
+  // -----------------------------------------------------
+  // 🔥🔥🔥 IMPORTANT: ENV PLUGIN FOR FRONTEND
+  // -----------------------------------------------------
+  plugins: [
+    async function envPlugin() {
+      return {
+        name: "env-plugin",
+        configureWebpack() {
+          return {
+            plugins: [
+              new webpack.DefinePlugin({
+                "process.env.BACKEND_URL": JSON.stringify(process.env.BACKEND_URL),
+                "process.env.QDRANT_COLLECTION": JSON.stringify(process.env.QDRANT_COLLECTION),
+              }),
+            ],
+          };
+        },
+      };
+    },
   ],
 
   themeConfig: {
