@@ -1,7 +1,5 @@
 export const config = { runtime: "edge" };
 
-import fetch from "node-fetch";
-
 export default async function handler(request) {
   try {
     const { query } = await request.json();
@@ -19,16 +17,17 @@ export default async function handler(request) {
     }
 
     // 1️⃣ Search documents from Qdrant
-    const qdrantResp = await fetch(`${QDRANT_URL}/collections/physical_ai_docs/points/scroll?limit=5`, {
-      headers: { "api-key": QDRANT_API_KEY }
-    });
+    const qdrantResp = await fetch(
+      `${QDRANT_URL}/collections/physical_ai_docs/points/scroll?limit=5`,
+      { headers: { "api-key": QDRANT_API_KEY } }
+    );
 
     const qdrantData = await qdrantResp.json();
     const search_results = qdrantData.points || [];
 
     const sources = search_results.map(r => ({
       id: r.id,
-      text: r.payload.text?.slice(0, 200) + (r.payload.text?.length>200?"...":""),
+      text: r.payload.text?.slice(0, 200) + (r.payload.text?.length > 200 ? "..." : ""),
       chapter: r.payload.chapter || "",
       section: r.payload.section || "",
       score: r.vector ? 1.0 : 0.0
@@ -60,7 +59,7 @@ Please provide a clear, concise answer based on the context, and cite relevant s
       })
     });
 
-    // 4️⃣ Stream response directly
+    // 4️⃣ Stream response directly (native fetch works in Edge)
     return new Response(cohereResp.body, {
       headers: { "Content-Type": "text/event-stream" }
     });
