@@ -1,16 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
-    },
-    {
-      "src": "api/ask_stream.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/ask_stream.js": {
+      "runtime": "@vercel/edge"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/ask_stream",
