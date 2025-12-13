@@ -1,6 +1,5 @@
 export const config = { runtime: "edge" };
 
-// Environment variables
 const COHERE_API_KEY = process.env.COHERE_API_KEY;
 const QDRANT_URL = process.env.QDRANT_URL;
 const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
@@ -8,14 +7,8 @@ const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
 const COLLECTION_NAME = "physical_ai_docs";
 const COHERE_API_URL = "https://api.cohere.ai/v1";
 
-if (!COHERE_API_KEY || !QDRANT_URL || !QDRANT_API_KEY) {
-  console.error("Missing required environment variables: COHERE_API_KEY, QDRANT_URL, QDRANT_API_KEY");
-}
-
-// Normalize Qdrant URL
 const getQdrantBaseUrl = () => QDRANT_URL.endsWith('/') ? QDRANT_URL.slice(0, -1) : QDRANT_URL;
 
-// Get embeddings from Cohere
 async function getEmbeddings(texts) {
   const res = await fetch(`${COHERE_API_URL}/embed`, {
     method: "POST",
@@ -25,43 +18,20 @@ async function getEmbeddings(texts) {
     },
     body: JSON.stringify({ texts, model: "embed-english-v3.0", input_type: "search_document" })
   });
-
   if (!res.ok) throw new Error(`Cohere embed API error: ${res.status}`);
   const data = await res.json();
   return data.embeddings;
 }
 
-// Search Qdrant
 async function searchDocuments(query, maxResults = 5) {
-  if (!QDRANT_API_KEY) throw new Error("Qdrant API key missing");
-
   const [queryVector] = await getEmbeddings([query]);
-
   const res = await fetch(`${getQdrantBaseUrl()}/collections/${COLLECTION_NAME}/points/search`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Api-Key": QDRANT_API_KEY
-    },
+    headers: { "Content-Type": "application/json", "Api-Key": QDRANT_API_KEY },
     body: JSON.stringify({ vector: queryVector, limit: maxResults, with_payload: true })
   });
-
-
-
-
-  const data = await res.json();
-  console.log(data.answer);
-}
-
-askBot("What is Physical AI?");
-
-
-
-
-
   if (!res.ok) throw new Error(`Qdrant search error: ${res.status}`);
   const data = await res.json();
-
   return data.result.map(point => ({
     id: point.id,
     text: point.payload.text || "",
@@ -69,9 +39,8 @@ askBot("What is Physical AI?");
     section: point.payload.section || "",
     score: point.score
   }));
+}
 
-
-// Simple hallucination detection
 function detectHallucination(answer, context) {
   const keyTerms = ["physical ai","humanoid","robotics","kinematics","dynamics","control","embodiment"];
   const matchedTerms = keyTerms.filter(t => answer.toLowerCase().includes(t) && context.toLowerCase().includes(t));
@@ -79,7 +48,6 @@ function detectHallucination(answer, context) {
   return { confidence_score: confidence };
 }
 
-// Edge API handler
 export default async function handler(req) {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
@@ -112,9 +80,7 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ answer, validation, sources: searchResults }), {
       headers: { "Content-Type": "application/json" }
     });
-
   } catch (error) {
-    console.error("API error:", error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }

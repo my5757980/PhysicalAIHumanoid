@@ -14,14 +14,7 @@ const ChatWidget = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // ✅ Vercel-compatible environment variables - use relative path for Vercel deployment
-  const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : '';
-  const COLLECTION = typeof process !== 'undefined' ? process.env.VITE_QDRANT_COLLECTION : null;
-
-  const getSelectedText = () => {
-    const text = window.getSelection()?.toString().trim();
-    return text || null;
-  };
+  const getSelectedText = () => window.getSelection()?.toString().trim() || null;
 
   useEffect(() => {
     const handleSelection = () => {
@@ -33,30 +26,18 @@ const ChatWidget = () => {
         setIsUserSelectedMode(false);
       }
     };
-
-    const escHandler = (e) => {
-      if (e.key === 'Escape') {
-        setSelectedText(null);
-        setIsUserSelectedMode(false);
-      }
-    };
+    const escHandler = (e) => { if (e.key === 'Escape') { setSelectedText(null); setIsUserSelectedMode(false); } };
 
     document.addEventListener('mouseup', handleSelection);
     document.addEventListener('keyup', escHandler);
-
     return () => {
       document.removeEventListener('mouseup', handleSelection);
       document.removeEventListener('keyup', escHandler);
     };
   }, []);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); };
+  useEffect(() => { scrollToBottom(); }, [messages]);
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -67,10 +48,6 @@ const ChatWidget = () => {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
-
-    const initialBotMessage = { type: 'bot', content: '', sources: [], isStreaming: true };
-    setMessages((prev) => [...prev, initialBotMessage]);
-    const botMessageIndex = messages.length;
 
     try {
       const response = await fetch('/api/ask_stream', {
@@ -85,67 +62,19 @@ const ChatWidget = () => {
       });
 
       if (!response.ok) throw new Error(`API error ${response.status}`);
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      let sources = [];
-      let fullAnswer = '';
+      const data = await response.json();
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+      const botMessage = {
+        type: 'bot',
+        content: data.answer || 'No answer generated',
+        sources: data.sources || [],
+        validation: data.validation || {},
+      };
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.type === 'sources') sources = data.sources;
-              else if (data.type === 'answer_chunk') {
-                fullAnswer += data.content;
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: fullAnswer, sources };
-                  return newMessages;
-                });
-              } else if (data.type === 'completion') {
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[botMessageIndex] = {
-                    ...newMessages[botMessageIndex],
-                    content: data.answer,
-                    isStreaming: false,
-                    sources,
-                    validation: data.validation,
-                  };
-                  return newMessages;
-                });
-              } else if (data.type === 'error') {
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[botMessageIndex] = {
-                    ...newMessages[botMessageIndex],
-                    content: data.message,
-                    isStreaming: false,
-                  };
-                  return newMessages;
-                });
-              }
-            } catch (e) {
-              console.error('Error parsing SSE data:', e);
-            }
-          }
-        }
-      }
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error(error);
-      setMessages((prev) => {
-        const newMessages = [...prev];
-        newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: 'Error occurred. Please try again.', isStreaming: false };
-        return newMessages;
-      });
+      setMessages((prev) => [...prev, { type: 'bot', content: 'Error occurred. Please try again.' }]);
     } finally {
       setIsLoading(false);
       setIsUserSelectedMode(false);
@@ -153,18 +82,8 @@ const ChatWidget = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  const toggleChat = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen) setTimeout(() => inputRef.current?.focus(), 150);
-  };
-
+  const handleKeyPress = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+  const toggleChat = () => { setIsOpen(!isOpen); if (!isOpen) setTimeout(() => inputRef.current?.focus(), 150); };
   const clearChat = () => setMessages([]);
 
   if (!isOpen) {
@@ -226,7 +145,6 @@ const ChatWidget = () => {
               </div>
             ))
           )}
-
           {isLoading && (
             <div className="chat-message bot">
               <div className="typing-indicator"><span></span><span></span><span></span></div>
