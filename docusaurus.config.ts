@@ -1,3 +1,4 @@
+// docusaurus.config.ts
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
@@ -15,7 +16,6 @@ const config: Config = {
     v4: true,
   },
 
-  // Production Website URL
   url: 'https://my5757980.github.io',
   baseUrl: '/PhysicalAIHumanoid/',
 
@@ -54,19 +54,17 @@ const config: Config = {
     ],
   ],
 
-  // -----------------------------------------------------
-  // 🔥🔥🔥 IMPORTANT: ENV PLUGIN FOR FRONTEND
-  // -----------------------------------------------------
+  // ✅ Plugin to expose VITE environment variables for frontend
   plugins: [
-    async function envPlugin() {
+    function envPlugin() {
       return {
-        name: "env-plugin",
+        name: 'env-plugin',
         configureWebpack() {
           return {
             plugins: [
               new webpack.DefinePlugin({
-                "process.env.BACKEND_URL": JSON.stringify(process.env.BACKEND_URL),
-                "process.env.QDRANT_COLLECTION": JSON.stringify(process.env.QDRANT_COLLECTION),
+                'import.meta.env.VITE_BACKEND_URL': JSON.stringify(process.env.VITE_BACKEND_URL),
+                'import.meta.env.VITE_QDRANT_COLLECTION': JSON.stringify(process.env.VITE_QDRANT_COLLECTION),
               }),
             ],
           };

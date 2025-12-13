@@ -1,3 +1,4 @@
+// ChatWidget.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import './ChatWidget.css';
@@ -13,11 +14,12 @@ const ChatWidget = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // ✅ Use environment variable for backend
-  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+  // ✅ Vite-compatible environment variables
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+  const COLLECTION = import.meta.env.VITE_QDRANT_COLLECTION;
 
   const getSelectedText = () => {
-    const text = window.getSelection().toString().trim();
+    const text = window.getSelection()?.toString().trim();
     return text || null;
   };
 
@@ -32,13 +34,14 @@ const ChatWidget = () => {
       }
     };
 
-    document.addEventListener('mouseup', handleSelection);
     const escHandler = (e) => {
       if (e.key === 'Escape') {
         setSelectedText(null);
         setIsUserSelectedMode(false);
       }
     };
+
+    document.addEventListener('mouseup', handleSelection);
     document.addEventListener('keyup', escHandler);
 
     return () => {
@@ -61,12 +64,12 @@ const ChatWidget = () => {
     const userMessage = { type: 'user', content: inputValue };
     const currentSelectedText = isUserSelectedMode ? selectedText : null;
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
 
     const initialBotMessage = { type: 'bot', content: '', sources: [], isStreaming: true };
-    setMessages(prev => [...prev, initialBotMessage]);
+    setMessages((prev) => [...prev, initialBotMessage]);
     const botMessageIndex = messages.length;
 
     try {
@@ -78,6 +81,7 @@ const ChatWidget = () => {
           selected_text: currentSelectedText,
           max_results: 5,
           temperature: 0.7,
+          collection: COLLECTION, // Vite env variable
         }),
       });
 
@@ -99,32 +103,34 @@ const ChatWidget = () => {
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.slice(6));
-
-              if (data.type === 'sources') {
-                sources = data.sources;
-              } else if (data.type === 'answer_chunk') {
+              if (data.type === 'sources') sources = data.sources;
+              else if (data.type === 'answer_chunk') {
                 fullAnswer += data.content;
-                setMessages(prev => {
+                setMessages((prev) => {
                   const newMessages = [...prev];
                   newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: fullAnswer, sources };
                   return newMessages;
                 });
               } else if (data.type === 'completion') {
-                setMessages(prev => {
+                setMessages((prev) => {
                   const newMessages = [...prev];
                   newMessages[botMessageIndex] = {
                     ...newMessages[botMessageIndex],
                     content: data.answer,
                     isStreaming: false,
                     sources,
-                    validation: data.validation
+                    validation: data.validation,
                   };
                   return newMessages;
                 });
               } else if (data.type === 'error') {
-                setMessages(prev => {
+                setMessages((prev) => {
                   const newMessages = [...prev];
-                  newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: data.message, isStreaming: false };
+                  newMessages[botMessageIndex] = {
+                    ...newMessages[botMessageIndex],
+                    content: data.message,
+                    isStreaming: false,
+                  };
                   return newMessages;
                 });
               }
@@ -136,7 +142,7 @@ const ChatWidget = () => {
       }
     } catch (error) {
       console.error(error);
-      setMessages(prev => {
+      setMessages((prev) => {
         const newMessages = [...prev];
         newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: 'Error occurred. Please try again.', isStreaming: false };
         return newMessages;
@@ -166,7 +172,7 @@ const ChatWidget = () => {
     return (
       <div className="chat-widget-fab" onClick={toggleChat}>
         <div className="chat-icon">💬</div>
-        {isUserSelectedMode && (<div className="selection-indicator"><span>!</span></div>)}
+        {isUserSelectedMode && <div className="selection-indicator"><span>!</span></div>}
       </div>
     );
   }
@@ -190,7 +196,7 @@ const ChatWidget = () => {
               {isUserSelectedMode && (
                 <div className="selected-text-prompt">
                   <p><strong>Selected text detected:</strong></p>
-                  <p>"{selectedText.substring(0, 120)}..."</p>
+                  <p>"{selectedText?.substring(0, 120)}..."</p>
                 </div>
               )}
             </div>
@@ -235,11 +241,11 @@ const ChatWidget = () => {
             ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder={isUserSelectedMode ? "Ask about the selected text…" : "Ask about Physical AI & Humanoid Robotics…"}
             rows={2}
             disabled={isLoading}
-          ></textarea>
+          />
           <button className="send-button" onClick={sendMessage} disabled={!inputValue.trim() || isLoading}>
             {isLoading ? 'Sending…' : 'Send'}
           </button>
