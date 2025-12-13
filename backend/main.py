@@ -155,7 +155,7 @@ def search_documents(query: str, max_results: int = 5) -> List[Dict[str, Any]]:
 
 def create_context_summary(query: str, context: str, sources: List[Dict[str, Any]]) -> str:
     """
-    Create a structured summary from the context when OpenAI is not available.
+    Create a structured summary from the context when Cohere is not available.
     This provides a more useful response than just raw context.
     """
     # Create a more structured response

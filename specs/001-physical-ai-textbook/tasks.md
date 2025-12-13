@@ -329,7 +329,7 @@ With multiple developers:
 ### Task 4 — RAG Logic
 - [X] T105 Implement retrieval function to get relevant chunks from Qdrant
 - [X] T106 Prioritize selected text in retrieval logic when provided
-- [X] T107 Generate answers via ChatKit/OpenAI Agents with retrieved context
+- [X] T107 Generate answers via Cohere with retrieved context
 - [X] T108 Attach citations to responses linking to source documents
 - [X] T109 Implement streaming response functionality
 

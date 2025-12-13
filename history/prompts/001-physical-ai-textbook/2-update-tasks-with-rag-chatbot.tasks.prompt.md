@@ -69,7 +69,7 @@ Append all new content **below** the current content in the task file.
 ### Task 4 — RAG Logic
 - Retrieve relevant chunks
 - If selection provided → prioritize
-- Generate answers via ChatKit/OpenAI Agents
+- Generate answers via Cohere
 - Attach citations
 - Stream response
 

@@ -14,9 +14,9 @@ const ChatWidget = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // ✅ Vite-compatible environment variables
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-  const COLLECTION = import.meta.env.VITE_QDRANT_COLLECTION;
+  // ✅ Vercel-compatible environment variables - use relative path for Vercel deployment
+  const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : '';
+  const COLLECTION = typeof process !== 'undefined' ? process.env.VITE_QDRANT_COLLECTION : null;
 
   const getSelectedText = () => {
     const text = window.getSelection()?.toString().trim();
@@ -73,7 +73,7 @@ const ChatWidget = () => {
     const botMessageIndex = messages.length;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/ask_stream`, {
+      const response = await fetch('/api/ask_stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -81,7 +81,6 @@ const ChatWidget = () => {
           selected_text: currentSelectedText,
           max_results: 5,
           temperature: 0.7,
-          collection: COLLECTION, // Vite env variable
         }),
       });
 

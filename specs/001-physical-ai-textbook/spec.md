@@ -209,7 +209,7 @@ As a user struggling with complex concepts in the documentation, I want the chat
 - **FR-005**: System MUST support priority mode where user-selected highlighted text takes precedence in query processing
 - **FR-006**: System MUST prevent hallucination by only providing information that exists in the book content
 - **FR-007**: System MUST implement a document ingestion pipeline that chunks book text (300-1200 tokens) with overlap (80-200 tokens) and stores embeddings in Qdrant
-- **FR-008**: System MUST use Cohere for generating embeddings and OpenAI for response generation
+- **FR-008**: System MUST use Cohere for generating embeddings and response generation
 - **FR-009**: System MUST stream responses to the user interface for better user experience
 - **FR-010**: System MUST handle concurrent users without degradation in response quality or performance
 

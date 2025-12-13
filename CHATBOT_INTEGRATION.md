@@ -5,17 +5,16 @@ This document provides instructions for setting up and running the RAG (Retrieva
 
 ## Architecture Overview
 - **Frontend**: Docusaurus 3 with React-based chat widget
-- **Backend**: FastAPI server with Qdrant, Cohere, and OpenAI integration
+- **Backend**: FastAPI server with Qdrant and Cohere integration
 - **Database**: Qdrant Cloud for vector storage
 - **Embeddings**: Cohere multilingual embeddings
-- **Generation**: OpenAI GPT for responses
+- **Generation**: Cohere for responses
 
 ## Prerequisites
 - Python 3.8+
 - Node.js 18+
 - Qdrant Cloud account (Free Tier)
 - Cohere API key
-- OpenAI API key
 
 ## Setup Instructions
 
@@ -38,7 +37,6 @@ pip install -r requirements.txt
 QDRANT_URL=your_qdrant_cluster_url
 QDRANT_API_KEY=your_qdrant_api_key
 COHERE_API_KEY=your_cohere_api_key
-OPENAI_API_KEY=your_openai_api_key
 ```
 
 4. Start the backend server:
@@ -128,7 +126,6 @@ Request body:
 - `QDRANT_URL`: Your Qdrant Cloud cluster URL
 - `QDRANT_API_KEY`: Your Qdrant API key
 - `COHERE_API_KEY`: Your Cohere API key
-- `OPENAI_API_KEY`: Your OpenAI API key
 
 ### Frontend (.env in project root)
 - `REACT_APP_API_BASE_URL`: URL of the backend API (default: http://localhost:8000)

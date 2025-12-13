@@ -33,7 +33,6 @@ npm start
 QDRANT_URL=your_qdrant_cluster_url
 QDRANT_API_KEY=your_qdrant_api_key
 COHERE_API_KEY=your_cohere_api_key
-OPENAI_API_KEY=your_openai_api_key
 ```
 
 ### Frontend .env file (root/.env):
@@ -46,7 +45,6 @@ REACT_APP_API_BASE_URL=http://localhost:8000
 1. Create accounts and get API keys:
    - Qdrant Cloud (Free Tier)
    - Cohere
-   - OpenAI
 
 2. Set up backend:
    ```bash

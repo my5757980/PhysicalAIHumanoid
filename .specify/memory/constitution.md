@@ -274,7 +274,7 @@ Backend:
 - Neon Serverless Postgres (optional logging)
 
 AI Models:
-- OpenAI Agents / ChatKit for final generation
+- Cohere for final generation
 - Embedding models from Cohere
 - Retrieval model: Qdrant → cosine similarity
 
