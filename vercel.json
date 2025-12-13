@@ -4,10 +4,6 @@
     {
       "src": "/api/ask_stream",
       "dest": "/api/ask_stream.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     }
   ]
 }

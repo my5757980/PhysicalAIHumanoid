@@ -170,10 +170,18 @@ ${query}
       }),
       { headers: { "Content-Type": "application/json" } }
     );
-  } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 500 }
-    );
-  }
+    } catch (error) {
+  console.error("API ERROR:", error);
+
+  return new Response(
+    JSON.stringify({
+      answer: "Backend error: " + error.message,
+      sources: [],
+      validation: { confidence_score: 0 }
+    }),
+    { status: 500 }
+  );
 }
+}
+
+  
