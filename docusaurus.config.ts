@@ -16,8 +16,8 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://my5757980.github.io',
-  baseUrl: '/PhysicalAIHumanoid/',
+  url: 'https://my5757980.github.io',  // This can be overridden with environment variable for Vercel
+  baseUrl: '/',
 
   organizationName: 'my5757980',
   projectName: 'PhysicalAIHumanoid',

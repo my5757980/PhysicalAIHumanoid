@@ -7,13 +7,6 @@
       "config": {
         "distDir": "build"
       }
-    },
-    {
-      "src": "api/ask_stream.js",
-      "use": "@vercel/node",
-      "config": {
-        "runtime": "edge"
-      }
     }
   ],
   "routes": [
@@ -30,5 +23,10 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ]
+  ],
+  "functions": {
+    "api/ask_stream.js": {
+      "runtime": "edge"
+    }
+  }
 }
