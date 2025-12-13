@@ -8,32 +8,25 @@ const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
 // Collection name
 const COLLECTION_NAME = "physical_ai_docs";
 
-// Check if all required environment variables are set
 if (!COHERE_API_KEY || !QDRANT_URL || !QDRANT_API_KEY) {
   console.error("Missing required environment variables. Set COHERE_API_KEY, QDRANT_URL, QDRANT_API_KEY.");
 }
 
-// Cohere API endpoint
 const COHERE_API_URL = "https://api.cohere.ai/v1";
 
-// Qdrant API endpoint - extract the actual URL from the QDRANT_URL env variable
 const getQdrantBaseUrl = () => {
   if (!QDRANT_URL) return null;
-  // Remove trailing slash if present
   return QDRANT_URL.endsWith('/') ? QDRANT_URL.slice(0, -1) : QDRANT_URL;
 };
 
-// Function to get embeddings from Cohere
 async function getEmbeddings(texts) {
-  if (!COHERE_API_KEY) {
-    throw new Error("COHERE_API_KEY is not set");
-  }
+  if (!COHERE_API_KEY) throw new Error("COHERE_API_KEY is not set");
 
   const response = await fetch(`${COHERE_API_URL}/embed`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${COHERE_API_KEY}`,
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       texts: texts,
@@ -51,27 +44,22 @@ async function getEmbeddings(texts) {
   return data.embeddings;
 }
 
-// Function to search documents in Qdrant
 async function searchDocuments(query, maxResults = 5) {
-  if (!QDRANT_API_KEY || !getQdrantBaseUrl()) {
-    throw new Error("QDRANT_URL or QDRANT_API_KEY is not set");
-  }
+  if (!QDRANT_API_KEY || !getQdrantBaseUrl()) throw new Error("QDRANT_URL or QDRANT_API_KEY is not set");
 
-  // First, get the embedding for the query
   const queryEmbedding = await getEmbeddings([query]);
   const queryVector = queryEmbedding[0];
 
-  // Qdrant search API call
   const qdrantResponse = await fetch(`${getQdrantBaseUrl()}/collections/${COLLECTION_NAME}/points/search`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Api-Key": QDRANT_API_KEY,
+      "Api-Key": QDRANT_API_KEY
     },
     body: JSON.stringify({
       vector: queryVector,
       limit: maxResults,
-      with_payload: true,
+      with_payload: true
     })
   });
 
@@ -82,8 +70,7 @@ async function searchDocuments(query, maxResults = 5) {
 
   const searchData = await qdrantResponse.json();
 
-  // Format the results to match the expected structure
-  const results = searchData.result.map(point => ({
+  return searchData.result.map(point => ({
     id: point.id,
     text: point.payload.text || "",
     chapter: point.payload.chapter || "",
@@ -91,50 +78,28 @@ async function searchDocuments(query, maxResults = 5) {
     score: point.score,
     metadata: point.payload.metadata || {}
   }));
-
-  return results;
 }
 
-// Enhanced hallucination detection function
 function detectHallucination(answer, context, sources = null) {
-  // Convert both to lowercase for comparison
   const answerLower = answer.toLowerCase();
   const contextLower = context.toLowerCase();
-
-  // Extract key phrases from the answer that should appear in the context
   const keyTerms = answerLower.match(/\b(physical ai|humanoid|robotics|kinematics|dynamics|control|embodiment|perception|learning|actuators|sensors|locomotion|manipulation|slam|reinforcement learning|imitation learning)\b/g) || [];
-
-  // Count how many key terms are found in the context
   const matchedTerms = keyTerms.filter(term => contextLower.includes(term));
-
-  // Calculate a basic confidence score
   const confidenceScore = keyTerms.length > 0 ? matchedTerms.length / keyTerms.length : 1.0;
-
-  // Check if the answer contains phrases indicating uncertainty (which might indicate hallucination was avoided)
   const uncertaintyPhrases = ["i don't know", "not mentioned", "not specified", "not found", "not in the text"];
   const hasUncertainty = uncertaintyPhrases.some(phrase => answerLower.includes(phrase));
 
-  // Check citation accuracy if sources are provided
-  let citationAccuracy = 1.0; // Default to perfect accuracy
+  let citationAccuracy = 1.0;
   const citationIssues = [];
-
   if (sources && sources.length > 0) {
-    // Check if the answer references content that's actually in the provided sources
     const sourceTexts = sources.map(source => source.text.toLowerCase());
     const sourceFullText = sourceTexts.join(" ");
-
-    // Check if key terms from the answer appear in the sources
     const sourceMatchedTerms = keyTerms.filter(term => sourceFullText.includes(term));
     citationAccuracy = keyTerms.length > 0 ? sourceMatchedTerms.length / keyTerms.length : 1.0;
-
-    // Identify any discrepancies
-    if (sourceMatchedTerms.length < matchedTerms.length) {
-      citationIssues.push("Some concepts in the answer may not be fully supported by the provided sources");
-    }
+    if (sourceMatchedTerms.length < matchedTerms.length) citationIssues.push("Some concepts in the answer may not be fully supported by the provided sources");
   }
 
-  // Check if answer seems to make claims not supported by context
-  const hasHallucination = confidenceScore < 0.3 && !hasUncertainty; // Basic threshold
+  const hasHallucination = confidenceScore < 0.3 && !hasUncertainty;
   const hasCitationIssues = citationAccuracy < 0.5;
 
   return {
@@ -148,81 +113,50 @@ function detectHallucination(answer, context, sources = null) {
     has_uncertainty_indicators: hasUncertainty,
     message: hasHallucination || hasCitationIssues
       ? "Potential issues detected: low confidence in context support or citation accuracy"
-      : `Answer validation: ${(confidenceScore * 100).toFixed(2)}% of key terms found in context, citation accuracy: ${(citationAccuracy * 100).toFixed(2)}%`
+      : `Answer validation: ${(confidenceScore*100).toFixed(2)}% of key terms found in context, citation accuracy: ${(citationAccuracy*100).toFixed(2)}%`
   };
 }
 
-// Main API handler
 export default async function handler(req) {
   if (req.method !== "POST") {
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      { status: 405, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" }
+    });
   }
 
   try {
     const { query, selected_text, max_results = 5, temperature = 0.7 } = await req.json();
+    if (!query) return new Response(JSON.stringify({ error: "Query is required" }), { status: 400, headers: { "Content-Type": "application/json" } });
 
-    if (!query) {
-      return new Response(
-        JSON.stringify({ error: "Query is required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Search for relevant documents
     const searchResults = await searchDocuments(query, max_results);
     const contextParts = searchResults.map(res => res.text);
     const sources = searchResults.map(r => ({
       id: r.id,
-      text: r.text.length > 200 ? r.text.substring(0, 200) + "..." : r.text,
+      text: r.text.length > 200 ? r.text.substring(0,200)+"..." : r.text,
       chapter: r.chapter,
       section: r.section,
       relevance_score: r.score
     }));
     const context = contextParts.join("\n\n");
 
-    // Create a ReadableStream for the response
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          // First, send the sources
-          const sourcesData = {
-            type: "sources",
-            sources: sources,
-            query: query
-          };
-          controller.enqueue(`data: ${JSON.stringify(sourcesData)}\n\n`);
-
-          // Then generate and stream the answer using Cohere
-          const finalPrompt = `Based on the following context from the Physical AI & Humanoid Robotics textbook, please answer the user's question. If the context doesn't contain the information needed to answer the question, please say so clearly.
-
-Context:
-${context}
-
-User's question: ${query}
-
-Please provide a clear, concise answer based on the context, and cite relevant sections when possible.`;
+          controller.enqueue(`data: ${JSON.stringify({ type: "sources", sources, query })}\n\n`);
+          const finalPrompt = `Based on the following context from the Physical AI & Humanoid Robotics textbook, please answer the user's question.\n\nContext:\n${context}\n\nUser's question: ${query}\n\nProvide a clear, concise answer based on context, citing relevant sections when possible.`;
 
           const response = await fetch(`${COHERE_API_URL}/chat`, {
             method: "POST",
             headers: {
               "Authorization": `Bearer ${COHERE_API_KEY}`,
               "Content-Type": "application/json",
-              "Accept": "text/event-stream",
+              "Accept": "text/event-stream"
             },
-            body: JSON.stringify({
-              message: finalPrompt,
-              model: "command-r-08-2024",
-              temperature: temperature,
-              stream: true
-            })
+            body: JSON.stringify({ message: finalPrompt, model: "command-r-08-2024", temperature, stream: true })
           });
 
-          if (!response.ok) {
-            throw new Error(`Cohere API error: ${response.status}`);
-          }
+          if (!response.ok) throw new Error(`Cohere API error: ${response.status}`);
 
           const reader = response.body.getReader();
           const decoder = new TextDecoder();
@@ -231,80 +165,40 @@ Please provide a clear, concise answer based on the context, and cite relevant s
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-
             const chunk = decoder.decode(value, { stream: true });
             const lines = chunk.split('\n');
-
             for (const line of lines) {
               if (line.trim() && line.startsWith("data: ")) {
                 const data = line.slice(6).trim();
-
-                if (data === "[DONE]") {
-                  continue;
-                }
-
+                if (data === "[DONE]") continue;
                 try {
                   const parsed = JSON.parse(data);
-
-                  // Handle different types of Cohere stream events
                   if (parsed.event_type === "text-generation" && parsed.text) {
                     fullAnswer += parsed.text;
-
-                    // Send the chunk as it arrives
-                    const chunkData = {
-                      type: "answer_chunk",
-                      content: parsed.text
-                    };
-                    controller.enqueue(`data: ${JSON.stringify(chunkData)}\n\n`);
-                  } else if (parsed.event_type === "stream-end") {
-                    // Stream has ended, perform final processing
-                    break;
-                  }
-                } catch (e) {
-                  // Ignore parsing errors for non-JSON lines
-                  continue;
-                }
+                    controller.enqueue(`data: ${JSON.stringify({ type: "answer_chunk", content: parsed.text })}\n\n`);
+                  } else if (parsed.event_type === "stream-end") break;
+                } catch { continue; }
               }
             }
           }
 
-          // Perform hallucination detection on the complete answer
           const validationResult = detectHallucination(fullAnswer, context, sources);
-
-          // Send completion message with validation
-          const completionData = {
-            type: "completion",
-            answer: fullAnswer,
-            validation: validationResult
-          };
-          controller.enqueue(`data: ${JSON.stringify(completionData)}\n\n`);
-
+          controller.enqueue(`data: ${JSON.stringify({ type: "completion", answer: fullAnswer, validation: validationResult })}\n\n`);
           controller.close();
         } catch (error) {
           console.error("Streaming error:", error);
-
-          const errorData = {
-            type: "error",
-            message: error.message
-          };
-          controller.enqueue(`data: ${JSON.stringify(errorData)}\n\n`);
+          controller.enqueue(`data: ${JSON.stringify({ type: "error", message: error.message })}\n\n`);
           controller.close();
         }
       }
     });
 
     return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-      },
+      headers: { "Content-Type": "text/plain", "Cache-Control": "no-cache", "Connection": "keep-alive" }
     });
+
   } catch (error) {
     console.error("API error:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
 }
