@@ -42,7 +42,7 @@ This project is configured for one-click deployment on Vercel. To deploy:
    - `COHERE_API_KEY`: Your Cohere API key
    - `QDRANT_URL`: Your Qdrant Cloud cluster URL
    - `QDRANT_API_KEY`: Your Qdrant API key
-4. Vercel will automatically build and deploy your site
+4. Vercel will automatically build and deploy your site using the configuration in vercel.json
 
 ### Environment Variables for Vercel
 
