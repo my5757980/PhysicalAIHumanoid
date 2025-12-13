@@ -4,20 +4,5 @@
     "api/ask_stream.js": {
       "runtime": "edge"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/ask_stream",
-      "dest": "/api/ask_stream.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "status": 404,
-      "dest": "/404.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  }
 }
