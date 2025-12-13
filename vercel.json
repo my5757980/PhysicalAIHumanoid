@@ -2,22 +2,12 @@
   "version": 2,
   "functions": {
     "api/ask_stream.js": {
-      "runtime": "@vercel/edge"
+      "runtime": "@vercel/edge@1.0.0"
     }
   },
   "routes": [
-    {
-      "src": "/api/ask_stream",
-      "dest": "/api/ask_stream.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "status": 404,
-      "dest": "/404.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/ask_stream", "dest": "/api/ask_stream.js" },
+    { "src": "/api/(.*)", "status": 404, "dest": "/404.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
