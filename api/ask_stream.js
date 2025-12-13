@@ -46,6 +46,19 @@ async function searchDocuments(query, maxResults = 5) {
     body: JSON.stringify({ vector: queryVector, limit: maxResults, with_payload: true })
   });
 
+
+
+
+  const data = await res.json();
+  console.log(data.answer);
+}
+
+askBot("What is Physical AI?");
+
+
+
+
+
   if (!res.ok) throw new Error(`Qdrant search error: ${res.status}`);
   const data = await res.json();
   return data.result.map(point => ({
@@ -55,7 +68,7 @@ async function searchDocuments(query, maxResults = 5) {
     section: point.payload.section || "",
     score: point.score
   }));
-}
+
 
 // Simple hallucination detection
 function detectHallucination(answer, context, sources = []) {
