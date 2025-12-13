@@ -1,3 +1,4 @@
+// api/ask_stream.js
 export const config = {
   runtime: "edge",
 };
@@ -5,8 +6,7 @@ export const config = {
 const COHERE_API_KEY = process.env.COHERE_API_KEY;
 const QDRANT_URL = process.env.QDRANT_URL;
 const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
-
-const COLLECTION_NAME = "physical_ai_docs";
+const COLLECTION_NAME = process.env.VITE_QDRANT_COLLECTION || "physical_ai_docs";
 const COHERE_API_URL = "https://api.cohere.ai/v1";
 
 const getQdrantBaseUrl = () =>
@@ -14,7 +14,7 @@ const getQdrantBaseUrl = () =>
 
 // ---------- SAFETY CHECK ----------
 function checkEnv() {
-  if (!COHERE_API_KEY || !QDRANT_URL || !QDRANT_API_KEY) {
+  if (!COHERE_API_KEY || !QDRANT_URL || !QDRANT_API_KEY || !COLLECTION_NAME) {
     throw new Error("Missing environment variables on Vercel");
   }
 }
@@ -35,7 +35,7 @@ async function getEmbeddings(texts) {
   });
 
   if (!res.ok) {
-    throw new Error(`Cohere embed error: ${res.status}`);
+    throw new Error(`Cohere embed API error: ${res.status}`);
   }
 
   const data = await res.json();
@@ -150,11 +150,10 @@ ${query}
     });
 
     if (!chatRes.ok) {
-      throw new Error(`Cohere chat error: ${chatRes.status}`);
+      throw new Error(`Cohere chat API error: ${chatRes.status}`);
     }
 
     const chatData = await chatRes.json();
-
     const answer =
       chatData?.text ||
       chatData?.message?.content?.[0]?.text ||
@@ -170,18 +169,16 @@ ${query}
       }),
       { headers: { "Content-Type": "application/json" } }
     );
-    } catch (error) {
-  console.error("API ERROR:", error);
+  } catch (error) {
+    console.error("API ERROR:", error);
 
-  return new Response(
-    JSON.stringify({
-      answer: "Backend error: " + error.message,
-      sources: [],
-      validation: { confidence_score: 0 }
-    }),
-    { status: 500 }
-  );
+    return new Response(
+      JSON.stringify({
+        answer: "Backend error: " + error.message,
+        sources: [],
+        validation: { confidence_score: 0 },
+      }),
+      { status: 500 }
+    );
+  }
 }
-}
-
-  
