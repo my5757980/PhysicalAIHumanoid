@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/ask_stream.js": {
+      "runtime": "@vercel/edge"
+    }
+  },
   "routes": [
     {
       "src": "/api/ask_stream",
