@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/ask_stream.js": {
-      "runtime": "edge"
+      "runtime": "@vercel/edge"
     }
   }
 }
