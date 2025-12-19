@@ -15,8 +15,14 @@ const ChatWidget = () => {
   const inputRef = useRef(null);
 
   // ✅ Vite-compatible environment variables
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-  const COLLECTION = import.meta.env.VITE_QDRANT_COLLECTION;
+  const API_BASE_URL = (
+    import.meta.env.VITE_BACKEND_URL ||
+    'https://my5757980-deploy.hf.space'
+  ).replace(/\/$/, '');
+
+  const COLLECTION = "physical_ai_docs";
+
+
 
   const getSelectedText = () => {
     const text = window.getSelection()?.toString().trim();
