@@ -20,7 +20,7 @@ const ChatWidget = () => {
     'https://my5757980-deploy.hf.space'
   ).replace(/\/$/, '');
 
-  const COLLECTION = "physical_ai_docs";
+  const COLLECTION = "physical_ai_book";
 
 
 
