@@ -13,8 +13,9 @@ const ChatWidget = () => {
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const botMessageIndexRef = useRef(null); // ✅ safe ref for index
 
-  // ✅ Vite-compatible environment variables
+  // Vite-compatible environment variables
   const API_BASE_URL = (
     import.meta.env.VITE_BACKEND_URL ||
     'https://my5757980-deploy.hf.space'
@@ -22,12 +23,7 @@ const ChatWidget = () => {
 
   const COLLECTION_NAME = "physical_ai_book";
 
-
-
-  const getSelectedText = () => {
-    const text = window.getSelection()?.toString().trim();
-    return text || null;
-  };
+  const getSelectedText = () => window.getSelection()?.toString().trim() || null;
 
   useEffect(() => {
     const handleSelection = () => {
@@ -56,13 +52,8 @@ const ChatWidget = () => {
     };
   }, []);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => { scrollToBottom(); }, [messages]);
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -70,19 +61,18 @@ const ChatWidget = () => {
     const userMessage = { type: 'user', content: inputValue };
     const currentSelectedText = isUserSelectedMode ? selectedText : null;
 
-    setMessages((prev) => [...prev, userMessage]);
+    // Add user message
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
 
     const initialBotMessage = { type: 'bot', content: '', sources: [], isStreaming: true };
+    
+    // ✅ Add bot message and save index safely
     setMessages(prev => {
-      const updated = [...prev, initialBotMessage];
-      return updated;
+      botMessageIndexRef.current = prev.length;
+      return [...prev, initialBotMessage];
     });
-    const botMessageIndex = messages.length + 1;
-
-
-
 
     try {
       const response = await fetch(`${API_BASE_URL}/ask_stream`, {
@@ -93,7 +83,7 @@ const ChatWidget = () => {
           selected_text: currentSelectedText,
           max_results: 5,
           temperature: 0.7,
-
+          collection: COLLECTION_NAME
         }),
       });
 
@@ -112,51 +102,66 @@ const ChatWidget = () => {
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.type === 'sources') sources = data.sources;
-              else if (data.type === 'answer_chunk') {
-                fullAnswer += data.content;
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: fullAnswer, sources };
-                  return newMessages;
-                });
-              } else if (data.type === 'completion') {
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[botMessageIndex] = {
-                    ...newMessages[botMessageIndex],
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === 'sources') sources = data.sources;
+            else if (data.type === 'answer_chunk') {
+              fullAnswer += data.content;
+              setMessages(prev => {
+                const newMessages = [...prev];
+                if (botMessageIndexRef.current !== null) {
+                  newMessages[botMessageIndexRef.current] = {
+                    ...newMessages[botMessageIndexRef.current],
+                    content: fullAnswer,
+                    sources
+                  };
+                }
+                return newMessages;
+              });
+            } else if (data.type === 'completion') {
+              setMessages(prev => {
+                const newMessages = [...prev];
+                if (botMessageIndexRef.current !== null) {
+                  newMessages[botMessageIndexRef.current] = {
+                    ...newMessages[botMessageIndexRef.current],
                     content: data.answer,
                     isStreaming: false,
                     sources,
-                    validation: data.validation,
+                    validation: data.validation
                   };
-                  return newMessages;
-                });
-              } else if (data.type === 'error') {
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[botMessageIndex] = {
-                    ...newMessages[botMessageIndex],
+                }
+                return newMessages;
+              });
+            } else if (data.type === 'error') {
+              setMessages(prev => {
+                const newMessages = [...prev];
+                if (botMessageIndexRef.current !== null) {
+                  newMessages[botMessageIndexRef.current] = {
+                    ...newMessages[botMessageIndexRef.current],
                     content: data.message,
-                    isStreaming: false,
+                    isStreaming: false
                   };
-                  return newMessages;
-                });
-              }
-            } catch (e) {
-              console.error('Error parsing SSE data:', e);
+                }
+                return newMessages;
+              });
             }
+          } catch (e) {
+            console.error('Error parsing SSE data:', e);
           }
         }
       }
     } catch (error) {
       console.error(error);
-      setMessages((prev) => {
+      setMessages(prev => {
         const newMessages = [...prev];
-        newMessages[botMessageIndex] = { ...newMessages[botMessageIndex], content: 'Error occurred. Please try again.', isStreaming: false };
+        if (botMessageIndexRef.current !== null) {
+          newMessages[botMessageIndexRef.current] = {
+            ...newMessages[botMessageIndexRef.current],
+            content: 'Error occurred. Please try again.',
+            isStreaming: false
+          };
+        }
         return newMessages;
       });
     } finally {
