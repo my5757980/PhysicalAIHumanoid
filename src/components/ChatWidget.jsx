@@ -76,10 +76,11 @@ const ChatWidget = () => {
 
     const initialBotMessage = { type: 'bot', content: '', sources: [], isStreaming: true };
     setMessages(prev => {
+      const botMessageIndex = prev.length; // correct index
       const updated = [...prev, initialBotMessage];
       return updated;
     });
-    const botMessageIndex = messages.length + 1;
+
 
 
     try {
