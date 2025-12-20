@@ -20,7 +20,7 @@ const ChatWidget = () => {
     'https://my5757980-deploy.hf.space'
   ).replace(/\/$/, '');
 
-  const COLLECTION = "physical_ai_book";
+  const COLLECTION_NAME = "physical_ai_book";
 
 
 
@@ -75,8 +75,12 @@ const ChatWidget = () => {
     setIsLoading(true);
 
     const initialBotMessage = { type: 'bot', content: '', sources: [], isStreaming: true };
-    setMessages((prev) => [...prev, initialBotMessage]);
-    const botMessageIndex = messages.length;
+    setMessages(prev => {
+      const updated = [...prev, initialBotMessage];
+      return updated;
+    });
+    const botMessageIndex = messages.length + 1;
+
 
     try {
       const response = await fetch(`${API_BASE_URL}/ask_stream`, {
@@ -87,7 +91,7 @@ const ChatWidget = () => {
           selected_text: currentSelectedText,
           max_results: 5,
           temperature: 0.7,
-          collection: COLLECTION, // Vite env variable
+
         }),
       });
 
