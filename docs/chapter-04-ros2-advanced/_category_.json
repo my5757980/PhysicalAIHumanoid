@@ -1,0 +1,8 @@
+{
+  "label": "Chapter 4: ROS 2 Advanced",
+  "position": 6,
+  "link": {
+    "type": "generated-index",
+    "description": "Dive deep into services, URDF, TF2, and navigation."
+  }
+}

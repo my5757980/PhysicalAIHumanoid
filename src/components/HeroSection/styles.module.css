@@ -1,0 +1,147 @@
+/* Hero Section - Full-width with prominent imagery */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  background-image: url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroContent {
+  text-align: center;
+  color: #FFFFFF;
+  padding: 2rem;
+  max-width: 800px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.heroDescription {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  opacity: 0.85;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.heroPrimaryButton {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background-color: #FFFFFF;
+  color: #000000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.125rem;
+  border: 2px solid #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+.heroPrimaryButton:hover {
+  background-color: transparent;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.heroSecondaryButton {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background-color: transparent;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.125rem;
+  border: 2px solid #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+.heroSecondaryButton:hover {
+  background-color: #FFFFFF;
+  color: #000000;
+  text-decoration: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 500px;
+  }
+
+  .heroContent {
+    padding: 1.5rem;
+  }
+
+  .heroTitle {
+    font-size: 2.25rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.25rem;
+  }
+
+  .heroDescription {
+    font-size: 1rem;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .heroPrimaryButton,
+  .heroSecondaryButton {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
+  }
+}

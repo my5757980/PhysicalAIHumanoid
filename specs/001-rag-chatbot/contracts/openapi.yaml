@@ -1,0 +1,255 @@
+openapi: "3.1.0"
+info:
+  title: Physical AI RAG Chatbot API
+  version: "1.0.0"
+  description: |
+    FastAPI backend for the Physical AI & Humanoid Robotics textbook RAG chatbot.
+    All responses are grounded exclusively in textbook content retrieved from Qdrant.
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+  - url: https://your-backend.railway.app
+    description: Production (Railway)
+
+paths:
+  /health:
+    get:
+      operationId: health_check
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  qdrant_connected:
+                    type: boolean
+                  version:
+                    type: string
+
+  /chat:
+    post:
+      operationId: chat_general
+      summary: General Q&A — answer from full book content
+      description: |
+        Accepts a question and optional conversation history.
+        Retrieves top-k document chunks from Qdrant, then generates a grounded
+        answer using gpt-4o-mini. Response streams via Server-Sent Events.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: |
+            Stream of Server-Sent Events. Each event is a JSON object.
+            Event types: delta (content chunk), citations (source list), done, error.
+            Response headers include Cache-Control: no-cache and X-Accel-Buffering: no
+            to prevent proxy/CDN buffering (required for Railway/Nginx deployments).
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/StreamChunk"
+        "422":
+          description: Validation error (empty question, malformed request)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "429":
+          description: Rate limit exceeded (10 requests/minute per IP)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitError"
+
+  /chat/selected:
+    post:
+      operationId: chat_selected_text
+      summary: Text-selection Q&A — answer scoped to selected passage
+      description: |
+        Accepts a question and the user's highlighted text passage.
+        Retrieval is weighted toward the chapter/section containing the selected text.
+        The selected text is injected into the generation context directly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+              required:
+                - question
+                - selected_text
+      responses:
+        "200":
+          description: Streaming SSE response (same format as /chat)
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/StreamChunk"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RateLimitError"
+
+  /ingest:
+    post:
+      operationId: trigger_ingestion
+      summary: Trigger document ingestion (admin/CI only)
+      description: |
+        Runs the ingestion pipeline: reads all docs/*.md, chunks, embeds,
+        and upserts to Qdrant. Idempotent — safe to run multiple times.
+        Protected by ADMIN_SECRET header in production.
+      security:
+        - AdminSecret: []
+      responses:
+        "200":
+          description: Ingestion complete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files_processed:
+                    type: integer
+                  chunks_upserted:
+                    type: integer
+                  duration_seconds:
+                    type: number
+
+components:
+  schemas:
+    HistoryMessage:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          maxLength: 4000
+
+    ChatRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: User's natural language question
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryMessage"
+          maxItems: 12
+          default: []
+          description: Last N conversation turns (frontend-managed)
+        selected_text:
+          type: string
+          maxLength: 1500
+          nullable: true
+          description: Highlighted text from the page (text-selection mode)
+        page_url:
+          type: string
+          nullable: true
+          description: Current page URL for context weighting
+        user_level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          nullable: true
+          description: User background level (bonus personalization hook)
+        translate_to:
+          type: string
+          enum: [urdu]
+          nullable: true
+          description: Translation target language (bonus Urdu hook)
+
+    Citation:
+      type: object
+      required:
+        - chapter_num
+        - chapter_title
+        - section_title
+      properties:
+        chapter_num:
+          type: integer
+          minimum: 0
+          maximum: 10
+        chapter_title:
+          type: string
+        section_title:
+          type: string
+
+    StreamChunk:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [delta, citations, done, error]
+        content:
+          type: string
+          nullable: true
+          description: Text fragment (for type=delta)
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Citation"
+          nullable: true
+          description: Source citations (for type=citations)
+        error:
+          type: string
+          nullable: true
+          description: Error message (for type=error)
+
+    ValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            properties:
+              loc:
+                type: array
+                items:
+                  type: string
+              msg:
+                type: string
+              type:
+                type: string
+
+    RateLimitError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Rate limit exceeded: 10 per 1 minute"
+
+  securitySchemes:
+    AdminSecret:
+      type: apiKey
+      in: header
+      name: X-Admin-Secret

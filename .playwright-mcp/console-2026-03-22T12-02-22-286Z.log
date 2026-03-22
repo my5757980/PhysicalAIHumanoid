@@ -1,0 +1,8 @@
+[    6891ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://botsman.fly.dev/pxl.gif?x=1&n=1774180948721&r=https://cloud.qdrant.io/:0
+[   55830ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://botsman.fly.dev/pxl.gif?x=1&n=1774180997750&r=:0
+[   66444ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://botsman.fly.dev/pxl.gif?x=1&n=1774181008206&r=:0
+[   67125ms] [ERROR] Attestation check for Attribution Reporting on https://www.google-analytics.com failed. @ https://login.cloud.qdrant.io/u/login/identifier?state=hKFo2SB6QU9ldjJkeTVoUExHOXpDaVN1ei1hcGsxaFZNRXhkX6Fur3VuaXZlcnNhbC1sb2dpbqN0aWTZIGhmbGJMQ2VVbWNQSW1JVXdYQm9vNEJNdno0dWJiaW5Po2NpZNkgckkxd2NPUEhPTWRlSHVUeDR4MWtGMEtGZFE3d25lemc:0
+[  110938ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://botsman.fly.dev/pxl.gif?x=1&n=1774181052069&r=https://github.com/:0
+[  111898ms] [ERROR] Attestation check for Attribution Reporting on https://www.google-analytics.com failed. @ https://cloud.qdrant.io/accounts/d2180e4b-aa6e-4de6-8024-65c39c93715b/clusters?provider=aws&region=sa-east-1:0
+[  113925ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://botsman.fly.dev/pxl.gif?x=1&n=1774181055436&r=https://cloud.qdrant.io/:0
+[  140249ms] [ERROR] Attestation check for Attribution Reporting on https://www.google-analytics.com failed. @ https://cloud.qdrant.io/accounts/d2180e4b-aa6e-4de6-8024-65c39c93715b/clusters/5980d4c5-f7f3-41b7-bb88-f06f938f16c2/overview?createApiKey=true:0

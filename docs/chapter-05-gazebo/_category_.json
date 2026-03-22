@@ -1,0 +1,8 @@
+{
+  "label": "Chapter 5: Robot Simulation with Gazebo",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Build physics-based simulations and virtual environments."
+  }
+}

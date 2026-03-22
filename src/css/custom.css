@@ -1,0 +1,352 @@
+/**
+ * Physical AI & Humanoid Robotics Textbook
+ * Constitution-mandated: Black-white color scheme only
+ * NO Docusaurus default blue (#2E8555)
+ */
+
+/* ============================================
+   COLOR SCHEME - Black & White Only
+   ============================================ */
+:root {
+  /* Primary colors - BLACK */
+  --ifm-color-primary: #000000;
+  --ifm-color-primary-dark: #000000;
+  --ifm-color-primary-darker: #000000;
+  --ifm-color-primary-darkest: #000000;
+  --ifm-color-primary-light: #333333;
+  --ifm-color-primary-lighter: #333333;
+  --ifm-color-primary-lightest: #333333;
+
+  /* Background - WHITE */
+  --ifm-background-color: #FFFFFF;
+  --ifm-background-surface-color: #FFFFFF;
+
+  /* Text colors */
+  --ifm-font-color-base: #000000;
+  --ifm-font-color-secondary: #333333;
+
+  /* Links - BLACK with underline on hover */
+  --ifm-link-color: #000000;
+  --ifm-link-hover-color: #333333;
+
+  /* Code styling */
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* Typography */
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.6;
+
+  /* Spacing and layout */
+  --ifm-container-width: 1200px;
+  --ifm-spacing-horizontal: 1rem;
+
+  /* Navbar */
+  --ifm-navbar-background-color: #FFFFFF;
+  --ifm-navbar-link-color: #000000;
+  --ifm-navbar-link-hover-color: #333333;
+
+  /* Footer */
+  --ifm-footer-background-color: #000000;
+  --ifm-footer-color: #FFFFFF;
+  --ifm-footer-link-color: #FFFFFF;
+}
+
+/* ============================================
+   SMOOTH SCROLL & PAGE TRANSITIONS
+   ============================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Page fade-in animation */
+.main-wrapper {
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   NAVIGATION STYLES
+   ============================================ */
+.navbar {
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: none;
+}
+
+.navbar__title {
+  font-weight: 700;
+}
+
+.navbar__link {
+  transition: opacity 0.2s ease, text-decoration 0.2s ease;
+}
+
+.navbar__link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.navbar__link--active {
+  font-weight: 600;
+}
+
+/* ============================================
+   SIDEBAR STYLES
+   ============================================ */
+.menu__link {
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.menu__link:hover {
+  background-color: #f5f5f5;
+  opacity: 0.9;
+}
+
+.menu__link--active {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+/* Sticky sidebar */
+.theme-doc-sidebar-container {
+  position: sticky;
+  top: calc(var(--ifm-navbar-height) + 1rem);
+}
+
+/* ============================================
+   CONTENT STYLES
+   ============================================ */
+.markdown {
+  max-width: 800px;
+}
+
+.markdown h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 0.5rem;
+}
+
+.markdown h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.markdown h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown p {
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.markdown ul, .markdown ol {
+  margin-bottom: 1.25rem;
+}
+
+.markdown li {
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================
+   BUTTON STYLES - Black & White Only
+   ============================================ */
+.button--primary {
+  background-color: #000000;
+  border-color: #000000;
+  color: #FFFFFF;
+}
+
+.button--primary:hover {
+  background-color: #333333;
+  border-color: #333333;
+  color: #FFFFFF;
+}
+
+.button--secondary {
+  background-color: #FFFFFF;
+  border-color: #000000;
+  color: #000000;
+}
+
+.button--secondary:hover {
+  background-color: #f5f5f5;
+  border-color: #000000;
+  color: #000000;
+}
+
+/* ============================================
+   TABLE STYLES
+   ============================================ */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+th {
+  background-color: #000000;
+  color: #FFFFFF;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+td {
+  border: 1px solid #e0e0e0;
+  padding: 0.75rem 1rem;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* ============================================
+   CODE BLOCK STYLES
+   ============================================ */
+pre {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+code {
+  background-color: #f5f5f5;
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+}
+
+/* ============================================
+   FOOTER STYLES
+   ============================================ */
+.footer {
+  background-color: #000000;
+  color: #FFFFFF;
+  padding: 2rem 0;
+}
+
+.footer__copyright {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+@media (max-width: 768px) {
+  .markdown {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .markdown h1 {
+    font-size: 2rem;
+  }
+
+  .markdown h2 {
+    font-size: 1.5rem;
+  }
+
+  .markdown h3 {
+    font-size: 1.25rem;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* ============================================
+   BREADCRUMB STYLES
+   ============================================ */
+.breadcrumbs {
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumbs__link {
+  color: #333333;
+  transition: color 0.2s ease;
+}
+
+.breadcrumbs__link:hover {
+  color: #000000;
+  text-decoration: underline;
+}
+
+/* ============================================
+   LEARNING OUTCOMES BOX
+   ============================================ */
+.learning-outcomes {
+  background-color: #f9f9f9;
+  border-left: 4px solid #000000;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.learning-outcomes h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+/* ============================================
+   CHAPTER CARD STYLES
+   ============================================ */
+.chapter-card {
+  border: 1px solid #e0e0e0;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.chapter-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   REMOVE ANY REMAINING DEFAULT COLORS
+   ============================================ */
+.theme-admonition {
+  border-left-color: #000000;
+}
+
+.theme-admonition-note {
+  background-color: #f9f9f9;
+  border-left-color: #333333;
+}
+
+.alert--info {
+  background-color: #f9f9f9;
+  border-color: #333333;
+  color: #000000;
+}
+
+.alert--success {
+  background-color: #f9f9f9;
+  border-color: #000000;
+  color: #000000;
+}
+
+/* Hide any remaining Docusaurus branding */
+.footer__link-item[href*="docusaurus"],
+.footer__link-item[href*="facebook"] {
+  display: none;
+}

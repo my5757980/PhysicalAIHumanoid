@@ -1,0 +1,8 @@
+{
+  "label": "Chapter 7: NVIDIA Isaac Platform",
+  "position": 9,
+  "link": {
+    "type": "generated-index",
+    "description": "Leverage Isaac Sim, Isaac ROS, and Isaac Gym."
+  }
+}
