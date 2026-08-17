@@ -29,8 +29,8 @@ An AI-native textbook for Physical AI & Humanoid Robotics, built with Docusaurus
 ### 1. Clone & install frontend
 
 ```bash
-git clone <repo-url>
-cd <repo>
+git clone https://github.com/my5757980/PhysicalAIHumanoid.git
+cd PhysicalAIHumanoid
 npm install
 ```
 
@@ -170,4 +170,3 @@ OPENAI_MODEL=grok-3-mini
 ```
 
 The backend is fully compatible with xAI's OpenAI-compatible API.
-"# PhysicalAIHumanoid" 
