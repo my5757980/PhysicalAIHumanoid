@@ -12,11 +12,11 @@ import styles from './styles.module.css';
  *   2. Mount/unmount the ChatPanel when open/closed.
  *   3. Wire useChat + useTextSelection hooks and pass props down.
  */
-export default function ChatWidget(): JSX.Element {
+export default function ChatWidget(): React.JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
   const chat = useChat();
-  const { selectedText, clearSelection } = useTextSelection();
+  const [selectedText, clearSelection] = useTextSelection();
 
   return (
     <div className={styles.container}>

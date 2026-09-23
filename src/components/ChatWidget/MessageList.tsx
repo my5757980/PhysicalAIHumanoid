@@ -15,7 +15,7 @@ interface MessageListProps {
 export default function MessageList({
   messages,
   isLoading,
-}: MessageListProps): JSX.Element {
+}: MessageListProps): React.JSX.Element {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages update

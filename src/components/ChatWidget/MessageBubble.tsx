@@ -21,7 +21,7 @@ interface MessageBubbleProps {
  * and avoid SSR issues. Markdown symbols in responses are still readable as-is.
  * To enable rich markdown rendering, replace the <p> with <ReactMarkdown>.
  */
-export default function MessageBubble({ message }: MessageBubbleProps): JSX.Element {
+export default function MessageBubble({ message }: MessageBubbleProps): React.JSX.Element {
   const isUser = message.role === 'user';
 
   return (

@@ -10,7 +10,7 @@ import ChatWidget from '../components/ChatWidget';
  * No imports from Docusaurus internals are needed — the children prop
  * passes through the normal page render tree untouched.
  */
-export default function Root({ children }: { children: React.ReactNode }): JSX.Element {
+export default function Root({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
     <>
       {children}

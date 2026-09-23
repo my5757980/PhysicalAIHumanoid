@@ -24,7 +24,7 @@ export default function ChatPanel({
   selectedText,
   onClearSelection,
   onClose,
-}: ChatPanelProps): JSX.Element {
+}: ChatPanelProps): React.JSX.Element {
   // ── Bonus: personalization level selector (T024) ───────────────────────────
   const [userLevel, setUserLevel] = useState<
     'beginner' | 'intermediate' | 'advanced' | null

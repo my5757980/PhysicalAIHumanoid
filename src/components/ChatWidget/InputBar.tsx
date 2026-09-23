@@ -18,7 +18,7 @@ export default function InputBar({
   onSend,
   disabled,
   placeholder = 'Ask about the textbook…',
-}: InputBarProps): JSX.Element {
+}: InputBarProps): React.JSX.Element {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

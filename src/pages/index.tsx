@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import React, {type ReactNode} from 'react';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
@@ -75,7 +75,7 @@ function ChapterCard({number, title, description, link}: {
   title: string;
   description: string;
   link: string;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <Link to={link} className={styles.chapterCard}>
       <div className={styles.chapterNumber}>Chapter {number}</div>
@@ -85,7 +85,7 @@ function ChapterCard({number, title, description, link}: {
   );
 }
 
-function ChaptersSection(): JSX.Element {
+function ChaptersSection(): React.JSX.Element {
   return (
     <section className={styles.chaptersSection}>
       <div className="container">
@@ -103,7 +103,7 @@ function ChaptersSection(): JSX.Element {
   );
 }
 
-function FeaturesSection(): JSX.Element {
+function FeaturesSection(): React.JSX.Element {
   return (
     <section className={styles.featuresSection}>
       <div className="container">

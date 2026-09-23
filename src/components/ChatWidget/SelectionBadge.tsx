@@ -15,7 +15,7 @@ interface SelectionBadgeProps {
 export default function SelectionBadge({
   text,
   onClear,
-}: SelectionBadgeProps): JSX.Element | null {
+}: SelectionBadgeProps): React.JSX.Element | null {
   if (!text) return null;
 
   const preview = text.length > 80 ? `${text.slice(0, 80)}…` : text;

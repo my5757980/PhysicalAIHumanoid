@@ -12,7 +12,7 @@ interface CitationListProps {
  */
 export default function CitationList({
   citations,
-}: CitationListProps): JSX.Element | null {
+}: CitationListProps): React.JSX.Element | null {
   if (citations.length === 0) return null;
 
   return (

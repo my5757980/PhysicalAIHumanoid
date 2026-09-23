@@ -2,7 +2,7 @@ import React from 'react';
 import Link from '@docusaurus/Link';
 import styles from './styles.module.css';
 
-export default function HeroSection(): JSX.Element {
+export default function HeroSection(): React.JSX.Element {
   return (
     <section className={styles.hero}>
       <div className={styles.heroOverlay}>
