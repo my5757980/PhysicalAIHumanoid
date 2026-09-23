@@ -113,8 +113,7 @@ pytest backend/tests/ -v
 │   └── .env.example
 ├── specs/001-rag-chatbot/   # SDD artifacts (spec, plan, tasks, contracts)
 └── .github/workflows/
-    ├── ci.yml               # TypeScript check + Python tests
-    └── deploy.yml           # GitHub Pages deployment
+    └── ci.yml               # TypeScript check + Python tests
 ```
 
 ---
@@ -125,14 +124,16 @@ pytest backend/tests/ -v
 
 1. Push `backend/` to your Railway/Render project
 2. Set environment variables (same as `.env.example`)
-3. Set `CORS_ORIGINS` to your GitHub Pages URL
+3. Set `CORS_ORIGINS` to your Vercel site URL
 4. Update `src/components/ChatWidget/config.ts` → `PROD_API_URL` with the backend URL
 
-### Frontend (GitHub Pages)
+### Frontend (Vercel)
+
+Vercel's GitHub integration builds and deploys every push to `main`
+(live: https://physical-ai-humanoid-robotics.vercel.app). To check a build locally:
 
 ```bash
 npm run build
-# GitHub Actions (deploy.yml) auto-deploys on push to main
 ```
 
 ---
